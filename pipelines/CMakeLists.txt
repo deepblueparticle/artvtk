@@ -1,6 +1,6 @@
 # basic source code CMakeLists.txt
 
-WARNING - ADDING A FILE TO THIS DIRECTORY WILL NOT TRIGGER
+# WARNING - ADDING A FILE TO THIS DIRECTORY WILL NOT TRIGGER
 # A REBUILD (since it doesn't change the CMakeLists.txt file).
 
 # install all *.fcl files in this directory
