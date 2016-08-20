@@ -1,0 +1,4 @@
+<lcgdict>
+    <class name="artvtk::VtkVizData" persistent="false"/>
+    <class name="art::Wrapper<artvtk::VtkVizData>"/>
+</lcgdict>
