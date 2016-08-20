@@ -54,6 +54,7 @@ private:
   vtkCPProcessor* catalystProcessor_;
   vtkCPDataDescription* dataDescription_;
   vtkTable* eventInfo_;
+  std::string pythonPipelineFileSearchPaths_;
   std::string pythonPipelineFileName_;
   unsigned int vizCounter_;
 

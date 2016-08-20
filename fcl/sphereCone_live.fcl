@@ -8,6 +8,19 @@ source : {
 }
 
 services: {
+
+ message : {
+     debugModules : ["*"]
+     suppressInfo : []
+
+     destinations : {
+       LogToConsole : {
+         type       : "cout"
+         threshold  : "DEBUG"
+       }
+     }
+  } // end of message services
+
   # Load the RandomNumberGenerator service without any options
   RandomNumberGenerator: {}
 

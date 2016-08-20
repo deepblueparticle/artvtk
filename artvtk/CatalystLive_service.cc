@@ -11,6 +11,7 @@
 #include "art/Framework/Services/Registry/ActivityRegistry.h"
 #include "art/Framework/Services/Registry/ServiceMacros.h"
 #include "fhiclcpp/ParameterSet.h"
+#include "cetlib/search_path.h"
 
 #include "vtkCPDataDescription.h"
 #include "vtkCPInputDataDescription.h"
@@ -22,11 +23,14 @@
 #include "vtkSmartPointer.h"
 
 #include <memory>
+#include <cstdlib>
+#include "messagefacility/MessageLogger/MessageLogger.h"
 
 artvtk::CatalystLive::CatalystLive(fhicl::ParameterSet const & p, art::ActivityRegistry & areg) :
    catalystProcessor_( vtkCPProcessor::New() ),
    dataDescription_(nullptr),
    eventInfo_(nullptr),
+   pythonPipelineFileSearchPaths_(p.get<std::string>("pythonPipelineFileSearchPaths", "STANDARD")),
    pythonPipelineFileName_( p.get<std::string>("pythonPipelineFileName", "catalystLiveMBDS_pipeline.py")),
    vizCounter_(0)
 {
@@ -34,6 +38,28 @@ artvtk::CatalystLive::CatalystLive(fhicl::ParameterSet const & p, art::ActivityR
   areg.sPostEndJob.watch(&CatalystLive::postEndJob, *this);
   areg.sPreProcessEvent.watch(&CatalystLive::preProcessEvent, *this);
   areg.sPostProcessEvent.watch(&CatalystLive::postProcessEvent, *this);
+
+  if ( pythonPipelineFileSearchPaths_ == "STANDARD") {
+
+    // Do we have ARTVTK_DIR?
+    std::string baseSearch;
+    char * artvtkdir = std::getenv("ARTVTK_DIR");
+    if ( artvtkdir ) {
+      baseSearch = std::string( artvtkdir );
+    }
+    else {
+      artvtkdir = std::getenv("MRB_BUILDDIR");
+      if ( ! artvtkdir ) {
+        throw cet::exception("CatalystLive_service") << "Neither $ARTVTK_DIR nor $MRB_BUILDDIR are set";
+      }
+      baseSearch = std::string(artvtkdir) + std::string("/artvtk");
+    }
+
+    pythonPipelineFileSearchPaths_ = std::string(".:") + baseSearch + std::string("/pipelines");
+  }
+
+  LOG_DEBUG("CatalystLive_service") << "Using pipeline file " << pythonPipelineFileName_ << " from search path "
+                                                                                         << pythonPipelineFileSearchPaths_;
 }
 
 void artvtk::CatalystLive::postEndJob() {
@@ -45,7 +71,20 @@ void artvtk::CatalystLive::postBeginJob() {
   // Initialize the processor
   catalystProcessor_->Initialize();
   vtkCPPythonScriptPipeline* pipeline = vtkCPPythonScriptPipeline::New();
-  pipeline->Initialize(pythonPipelineFileName_.c_str());
+
+  // Determine the path to the python pipeline file
+  LOG_INFO("CatalylstLive_service") << "Searching for " << pythonPipelineFileName_ << " in paths " << pythonPipelineFileSearchPaths_;
+  cet::search_path searchPath { pythonPipelineFileSearchPaths_ };
+  std::string pipelinePath = searchPath.find_file( pythonPipelineFileName_ );
+  LOG_INFO("CatalylstLive_service") << "Found pipeline file " << pipelinePath;
+
+  // Initialize the pipeline
+  int ok = pipeline->Initialize(pipelinePath.c_str());
+  if (! ok) {
+    throw cet::exception("CatalystLive_service") << "Cannot find python pipeline file " << pipelinePath << ".\n";
+  }
+
+  // Add it to the processor
   catalystProcessor_->AddPipeline(pipeline);
 }
 
