@@ -4,7 +4,7 @@ process: "artvtk"
 
 source : {
   module_type: EmptyEvent
-  maxEvents: 100
+  maxEvents: 3
 }
 
 services: {
