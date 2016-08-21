@@ -85,7 +85,7 @@ to expand the list and see the individual `vtm` files) because they
 are in numerical sequence. Double click on that group (as shown).
 ![Open VTM files](readme_img/openvtm.png)
 Click on `Apply` in the `Properties` window. You can now use the "VCR"
-buttons to see the events like a slide show.
+buttons at the top of the ParaView main window to see the events like a slide show.
 ![Slide Show](readme_img/slideshow.png)
 
 Let's now run the Catalyst live examples. For these, you must have 
@@ -129,7 +129,7 @@ and `vizes`. You should then see `Extract: eventinfo` and `Extract: vizes`
 appear under `builtin`. Click on the greyed eye icon next to `Extract: vizes`. 
 A new render window may appear. You may close the old one. You are now 
  looking at the first event. 
-![First event](firstEvent.png)
+![First event](readme_img/firstEvent.png)
 
 You can advance to subsequent event by going to the `Catalyst` menu
 and selecting `Set Breakpoint`. Use `Time` for the event number. Note
