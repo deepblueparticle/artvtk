@@ -48,6 +48,9 @@ private:
   std::string makeFilename(const art::Event &e) const;
 
   std::string baseFileName_;
+  std::string writeMode_; // ascii, binary, appended
+  bool zlibCompression_;  // only for appended
+  bool encodeAppended_;   // if true, use base64 encoding (true XML, but slower to read)
 
 };
 
@@ -55,7 +58,10 @@ private:
 artvtk::WriteVtkVizData::WriteVtkVizData(fhicl::ParameterSet const & p)
   :
   EDAnalyzer(p),
-  baseFileName_( p.get<std::string>("baseFileName") )
+  baseFileName_( p.get<std::string>("baseFileName") ),
+  writeMode_( p.get<std::string>("writeMode", "appended")),
+  zlibCompression_( p.get<bool>("zlibCompression", true)),
+  encodeAppended_( p.get<bool>("encodeAppended", false))
 {}
 
 void artvtk::WriteVtkVizData::analyze(art::Event const & e)
@@ -82,6 +88,29 @@ void artvtk::WriteVtkVizData::analyze(art::Event const & e)
   // Write it out
   vtkSmartPointer<vtkXMLMultiBlockDataWriter> mbw = vtkSmartPointer<vtkXMLMultiBlockDataWriter>::New();
   mbw->SetFileName(fileName.c_str());
+
+  // Determine the data mode
+  if ( writeMode_ == "appended" ) {
+    mbw->SetDataModeToAppended();
+    mbw->SetEncodeAppendedData(encodeAppended_ ? 1 : 0);
+
+    if ( zlibCompression_ ) {
+      mbw->SetCompressorTypeToZLib();
+    }
+    else {
+      mbw->SetCompressorTypeToNone();
+    }
+  }
+  else if ( writeMode_ == "ascii" ) {
+    mbw->SetDataModeToAscii();
+  }
+  else if ( writeMode_ == "binary" ) {
+    mbw->SetDataModeToBinary();
+  }
+  else {
+    throw cet::exception("WriteVtkVizData") << "Unknown write mode; choose ascii, binary, or appended (default)" << "\n";
+  }
+
   mbw->SetInputData(mb);
   mbw->Write();
 }

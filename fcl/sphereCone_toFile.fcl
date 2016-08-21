@@ -22,7 +22,10 @@ physics : {
     showVizes : { module_type: ShowVtkVizObjectsInEvent }
     writeVtk : {
       module_type: WriteVtkVizData
-      baseFileName: "mbout"
+      baseFileName: "mbdout"
+      writeMode: "appended"
+      zlibCompression: true
+      encodeAppended: false
     }
   }
 
