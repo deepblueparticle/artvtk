@@ -70,7 +70,8 @@ gm2 -c sphereCone_show.fcl
 ```
 
 **Run `sphereCone_toFile.fcl` .** This FCL writes the VTK objects in the 
- event to a multiblockdata XML file set, one file set per event. A file set
+ event to a multiblockdata XML file set, one file set per event, using
+ the `WriteVtkVizData` analyzer. A file set
  consists of a `.vtm` file and a corresponding directory containing the 
  consituent `.vtp` files. 
  
@@ -88,8 +89,8 @@ Click on `Apply` in the `Properties` window. You can now use the "VCR"
 buttons at the top of the ParaView main window to see the events like a slide show.
 ![Slide Show](readme_img/slideshow.png)
 
-Let's now run the Catalyst live examples. For these, you must have 
-ParaView up and running and connected to CataLyst. 
+**Let's now run the Catalyst live examples.** For these, you must have 
+ParaView up and running and connected to Catalyst. 
 
 To do that, start ParaView and go to the `Catalyst` menu and select `Connect`. 
 Accept the default port. On a Mac, you may get a dialog box asking to allow for
@@ -120,6 +121,10 @@ Now, run `art` with
 gm2 -c sphereCone_live.fcl`
 ```
 
+This FCL file runs the `CatalystLiveVtkViz` analyzer. Note that this
+analyzer uses the `CatalystLive` service to communicate with 
+Catalyst. 
+
 Art should stop on the first event. ParaView may open a dialog window 
 warning that the `ProxyManger` is not set. Click on "Close" as that
 warning seems to be benign. 
@@ -131,7 +136,7 @@ A new render window may appear. You may close the old one. You are now
  looking at the first event. 
 ![First event](readme_img/firstEvent.png)
 
-You can advance to subsequent event by going to the `Catalyst` menu
+You can advance to a subsequent event by going to the `Catalyst` menu
 and selecting `Set Breakpoint`. Use `Time` for the event number. Note
 that for some reason, ParaView will stop at the event after the one 
 you specify. Go to the `Catalyst` menu and select `Continue` to go 
@@ -140,7 +145,5 @@ to that event.
 If you quit ParaView, `art` will continue making `VTK` objects and
 trying to connect to a ParaView client. If you use the 
 `sphereCone_live_ifConnected.fcl` FCL file, then VTK objects will not be
-created if no ParaView client is connected. 
-
-
-
+created if no ParaView client is connected. That functionality
+is accomplished by using the `LiveVizFilter` module. 
