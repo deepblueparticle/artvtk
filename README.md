@@ -61,7 +61,7 @@ in the `artvtk/example` directory). `Sphere` generates sphere at a random
 position with a random size. `Cone` generates up to 10 cones and random
  positions with random sizes. 
 
-Run `sphereCone_show.fcl` . This FCL file runs the `ShowVtkVizObjectsInEvent` 
+**Run `sphereCone_show.fcl` .** This FCL file runs the `ShowVtkVizObjectsInEvent` 
 analyzer which merely prints out the `VtkVizData` objects found in the
 event. 
 
@@ -69,7 +69,7 @@ event.
 gm2 -c sphereCone_show.fcl
 ```
 
-Run `sphereCone_toFile.fcl` . This FCL writes the VTK objects in the 
+**Run `sphereCone_toFile.fcl` .** This FCL writes the VTK objects in the 
  event to a multiblockdata XML file set, one file set per event. A file set
  consists of a `.vtm` file and a corresponding directory containing the 
  consituent `.vtp` files. 
@@ -78,9 +78,69 @@ Run `sphereCone_toFile.fcl` . This FCL writes the VTK objects in the
  gm2 -c sphereCone_toFile.fcl
  ```
 
-Start up ParaView and open the set of VTM files. 
+Start up ParaView and open the set of VTM files as per the image below.
+Do not click on the directories. Note that ParaView has grouped the 
+`vtm` files (as seen by the expansion triangle on the left - click on that
+to expand the list and see the individual `vtm` files) because they 
+are in numerical sequence. Double click on that group (as shown).
 ![Open VTM files](readme_img/openvtm.png)
+Click on `Apply` in the `Properties` window. You can now use the "VCR"
+buttons to see the events like a slide show.
+![Slide Show](readme_img/slideshow.png)
 
+Let's now run the Catalyst live examples. For these, you must have 
+ParaView up and running and connected to CataLyst. 
+
+To do that, start ParaView and go to the `Catalyst` menu and select `Connect`. 
+Accept the default port. On a Mac, you may get a dialog box asking to allow for
+outside connections. If you are running `art` on a different machine, then
+click on `Allow`, otherwise click on `Deny`. Accept the confirmation box
+that will appear. 
+
+Now you want to put Catalyst in pause mode so that
+you can see the first event. Go go the `Catalyst` menu and select 
+`Pause Simulation`.
+
+On the machine that is running `art`, if that machine is not the same
+as where ParaView is running, you will then need to alter the 
+python pipeline file. Run the command below, changing `<YOUR MACHINE>` 
+to the name or IP address of the machine running ParaView.  
+
+```bash
+# Only do this if you are running ParaView on a different machine than
+# art (including VMs and docker containers)
+cp $MRB_BUILDDIR/artvtk/pipelines/catalystLiveMBDS_pipeline.py  .
+sed -i 's/localhost/<YOUR MACHINE>/' catalystLiveMBDS_pipeline.py
+# For example
+# sed -i 's/localhost/192.168.50.1/' catalystLiveMBDS_pipeline.py
+```
+
+Now, run `art` with
+```bash
+gm2 -c sphereCone_live.fcl`
+```
+
+Art should stop on the first event. ParaView may open a dialog window 
+warning that the `ProxyManger` is not set. Click on "Close" as that
+warning seems to be benign. 
+
+Now in the Pipeline Browser window under `catalyst:`, click on the greyed icons next to `evnetinfo`
+and `vizes`. You should then see `Extract: eventinfo` and `Extract: vizes`
+appear under `builtin`. Click on the greyed eye icon next to `Extract: vizes`. 
+A new render window may appear. You may close the old one. You are now 
+ looking at the first event. 
+![First event](firstEvent.png)
+
+You can advance to subsequent event by going to the `Catalyst` menu
+and selecting `Set Breakpoint`. Use `Time` for the event number. Note
+that for some reason, ParaView will stop at the event after the one 
+you specify. Go to the `Catalyst` menu and select `Continue` to go 
+to that event. 
+
+If you quit ParaView, `art` will continue making `VTK` objects and
+trying to connect to a ParaView client. If you use the 
+`sphereCone_live_ifConnected.fcl` FCL file, then VTK objects will not be
+created if no ParaView client is connected. 
 
 
 
