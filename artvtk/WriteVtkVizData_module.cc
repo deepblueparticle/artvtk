@@ -59,8 +59,8 @@ artvtk::WriteVtkVizData::WriteVtkVizData(fhicl::ParameterSet const & p)
   :
   EDAnalyzer(p),
   baseFileName_( p.get<std::string>("baseFileName") ),
-  writeMode_( p.get<std::string>("writeMode", "appended")),
-  zlibCompression_( p.get<bool>("zlibCompression", true)),
+  writeMode_( p.get<std::string>("writeMode", "ascii")),
+  zlibCompression_( p.get<bool>("zlibCompression", false)),
   encodeAppended_( p.get<bool>("encodeAppended", false))
 {}
 
@@ -88,6 +88,9 @@ void artvtk::WriteVtkVizData::analyze(art::Event const & e)
   // Write it out
   vtkSmartPointer<vtkXMLMultiBlockDataWriter> mbw = vtkSmartPointer<vtkXMLMultiBlockDataWriter>::New();
   mbw->SetFileName(fileName.c_str());
+
+  // By default turn off compression
+  mbw->SetCompressorTypeToNone();
 
   // Determine the data mode
   if ( writeMode_ == "appended" ) {

@@ -86,6 +86,7 @@ void artvtk::CatalystLiveVtkViz::analyze(art::Event const & e)
   LOG_INFO("CatalystLiveVtkViz") << "Visualizing!!";
 
   catalyst->vizit();
+  LOG_INFO("CatalystLiveVtkViz") << "Done Visualizing!!";
   usleep(sleepusec_);
 }
 
